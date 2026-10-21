@@ -1,0 +1,100 @@
+from __future__ import annotations
+
+import os
+from dataclasses import dataclass
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load .env file from project root
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+load_dotenv(dotenv_path=BASE_DIR / ".env")
+
+
+@dataclass(frozen=True)
+class ThemeColors:
+    """Standardized color palette for Kyoka cryptographic cyber theme."""
+    PRIMARY: int = 0x6D4AFF      # Aizen violet
+    SUCCESS: int = 0x57D9FF      # Aizen cyan
+    ERROR: int = 0xFF496C          # Crimson
+    WARNING: int = 0xFFC857      # Amber
+    INFO: int = 0x8B7CFF           # Violet
+    DARK: int = 0x100D20           # Aizen night
+    SECONDARY: int = 0x34266B       # Deep violet
+    ACCENT: int = 0x53D8FB         # Ice blue
+
+
+@dataclass(frozen=True)
+class ThemeEmojis:
+    """Standardized system emojis for Kyoka embeds."""
+    SUCCESS: str = ""
+    ERROR: str = ""
+    WARNING: str = ""
+    INFO: str = ""
+    LOADING: str = ""
+    SHIELD: str = ""
+    SPARKLES: str = ""
+    SETTINGS: str = ""
+    PING: str = ""
+    DATABASE: str = ""
+    BOT: str = ""
+    KYOKA: str = ""
+
+
+class Config:
+    """Bot global configuration."""
+    
+    # Discord Bot Token
+    TOKEN: str = (
+        os.getenv("DISCORD_TOKEN")
+        or os.getenv("BOT_TOKEN")
+        or os.getenv("TOKEN")
+        or ""
+    ).strip()
+    CLIENT_ID: int = int(os.getenv("CLIENT_ID", "0"))
+    
+    # Prefixes & Identity
+    BOT_NAME: str = os.getenv("BOT_NAME", "Kyoka")
+    DEFAULT_PREFIX: str = os.getenv("BOT_PREFIX", "&")
+    
+    # Environment & Dev Settings
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development").lower()
+    DEV_GUILD_ID: int | None = (
+        int(os.getenv("DEV_GUILD_ID")) if os.getenv("DEV_GUILD_ID") else None
+    )
+    SYNC_COMMANDS_ON_STARTUP: bool = (
+        os.getenv("SYNC_COMMANDS_ON_STARTUP", "false").lower() in ("true", "1", "yes")
+    )
+    
+    # PostgreSQL / Supabase Database Settings
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "").strip()
+
+    # Lavalink / Audio Settings
+    LAVALINK_URI: str = os.getenv("LAVALINK_URI", "http://lava2.kasawa.pro:2334").strip()
+    LAVALINK_PASSWORD: str = os.getenv("LAVALINK_PASSWORD", "youshallnotpass").strip()
+
+    # Aesthetics
+    COLORS: ThemeColors = ThemeColors()
+    EMOJIS: ThemeEmojis = ThemeEmojis()
+    
+    # Bot Branding & Official Links
+    BOT_NAME: str = os.getenv("BOT_NAME", "KYOKA 1.0")
+    VERSION: str = "1.0.0"
+    FOOTER_TEXT: str = "Made by Ruthupavan (Aizen) • KYOKA 1.0"
+    INVITE_URL: str = os.getenv(
+        "INVITE_URL",
+        "https://discord.com/oauth2/authorize?client_id=1544289369907658853&permissions=8&integration_type=0&scope=applications.commands+bot",
+    ).strip()
+    SUPPORT_URL: str = os.getenv("SUPPORT_URL", "https://discord.gg/p6GvJtsMb").strip()
+
+    @classmethod
+    def validate(cls) -> None:
+        """Validate required configuration values."""
+        if not cls.TOKEN:
+            raise ValueError(
+                "DISCORD_TOKEN is missing! Please set your bot token in the .env file."
+            )
+        if not cls.DATABASE_URL:
+            raise ValueError(
+                "DATABASE_URL is missing! Please set your Supabase connection string in the .env file."
+            )
+
